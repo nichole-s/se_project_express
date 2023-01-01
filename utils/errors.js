@@ -20,8 +20,6 @@ const handleError = (err, res) => {
   }
   if (err.statusCode === 404) {
     res.status(ERROR_CODES.NotFound).send({ message: 'Item not found' });
-
-    return;
   } else {
     res
       .status(ERROR_CODES.DefaultError)

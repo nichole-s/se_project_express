@@ -7,7 +7,13 @@ const createItem = (req, res) => {
   const createdAt = Date.now();
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, imageUrl, weather, owner, createdAt })
+  ClothingItem.create({
+    name,
+    imageUrl,
+    weather,
+    owner,
+    createdAt,
+  })
     .then((item) => {
       res.status(200).send({ data: item });
     })
@@ -31,7 +37,7 @@ const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .orFail(() => {
       handleOnFailError();
@@ -48,7 +54,7 @@ const dislikeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .orFail(() => {
       handleOnFailError();
