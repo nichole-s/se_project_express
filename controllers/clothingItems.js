@@ -66,7 +66,7 @@ const deleteItem = (req, res) => {
     .orFail(() => {
       handleOnFailError();
     })
-    .then(() => res.status(204).send({}))
+    .then(() => res.status(200).send({}))
     .catch((err) => {
       handleError(err, res);
     });
