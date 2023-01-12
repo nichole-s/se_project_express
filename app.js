@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors');
+// const cors = require('cors');
 const mongoose = require('mongoose');
 const { createUser, login } = require('./controllers/users');
 const clothingItem = require('./routes/clothingItems');
@@ -13,7 +13,7 @@ const app = express();
 // const routes = require('./routes');
 
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
 // app.use((req, res, next) => {
 //   req.user = {
 //     _id: '63a27f7e04a1f23a6e9413df',
