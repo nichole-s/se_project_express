@@ -37,7 +37,7 @@ const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .orFail(() => {
       handleOnFailError();
@@ -54,7 +54,7 @@ const dislikeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .orFail(() => {
       handleOnFailError();
@@ -72,7 +72,15 @@ const deleteItem = (req, res) => {
     .orFail(() => {
       handleOnFailError();
     })
-    .then(() => res.status(200).send({}))
+    // .then(() => res.status(200).send({}))
+    .then((item) => {
+      if (item.owner.equals(req.user._id)) {
+        return item.remove(() => res.send({ clothingItem: item }));
+      }
+      return res.status(403).send({
+        message: 'You do not have permission to delete another users item',
+      });
+    })
     .catch((err) => {
       handleError(err, res);
     });
