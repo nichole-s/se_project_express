@@ -6,42 +6,59 @@ const { JWT_SECRET } = require('../utils/config');
 const { handleOnFailError, handleError } = require('../utils/errors');
 
 // Create
+// const createUser = (req, res) => {
+//   const {
+//     name, avatar, email, password,
+//   } = req.body;
+//   User.findOne({ email }).then((user) => {
+//     if (user) {
+//       const error = new Error('User with this email already exists');
+//       error.statusCode = 11000;
+//       throw error;
+//     }},
+//    bcrypt.hash(password, 10)
+//     .then(hash => User.create({
+//       name, avatar, email, password: hash,
+//     })
+//     .then((user) => res.send(user)) 
+//     .catch((err) => {
+//       handleError(err, res);
+//     })
+//   },
+
 const createUser = (req, res) => {
   const {
     name, avatar, email, password,
   } = req.body;
-  User.findOne({ email }).then((user, err) => {
-    if (err) {
-      return res.status(500).send({ message: 'Server error' });
-    }
-    if (user) {
+  bcrypt.hash(password, 10).then((hash) => User.create({
+    name,
+    avatar,
+    email,
+    password: hash,
+  })).then((user) => {
+    res.send(user);
+  }).catch((err) => {
+    // handle the error
+    if (err.name === 'MongoServerError') {
       const error = new Error('User with this email already exists');
-      error.statusCode = 409;
-      throw error;
+      error.statusCode = 11000;
+      handleError(err, res);
     }
-    return bcrypt.hash(password, 10).then((hash) => {
-      User.create({
-        name, avatar, email, password: hash,
-      })
-        .then((item) => res.setHeader('Content-Type', 'application/json').status(201).send({
-          name: item.name,
-          avatar: item.avatar,
-          email: item.email,
-        })).catch(() => {
-          handleError(err, res);
-        });
+  })
+    .then((user) => res.send(user))
+    .catch((err) => {
+      handleError(err, res);
     });
-  });
 };
 
 // Read
-// const getUsers = (req, res) => {
-//   User.find({})
-//     .then((users) => res.status(200).send(users))
-//     .catch((err) => {
-//       handleError(err, res);
-//     });
-// };
+const getUsers = (req, res) => {
+  User.find({})
+    .then((users) => res.status(200).send(users))
+    .catch((err) => {
+      handleError(err, res);
+    });
+};
 
 const getCurrentUser = (req, res) => {
   const { _id } = req.params;
@@ -89,6 +106,7 @@ const login = (req, res) => {
 
 module.exports = {
   createUser,
+  getUsers,
   getCurrentUser,
   updateUser,
   login,

@@ -5,6 +5,7 @@ const ERROR_CODES = {
   NotFound: 404,
   AlreadyExistsError: 409,
   DefaultError: 500,
+  MongoError: 11000,
 };
 
 const handleOnFailError = () => {
@@ -30,6 +31,8 @@ const handleError = (err, res) => {
     res
       .status(ERROR_CODES.AlreadyExistsError)
       .send({ message: 'Email already exists' });
+  } else if (err.statusCode === 11000) {
+    res.status(ERROR_CODES.MongoError).send({ message: 'Database error' });
   } else {
     res
       .status(ERROR_CODES.DefaultError)
