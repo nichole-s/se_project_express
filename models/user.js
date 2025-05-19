@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
       validator: (v) => validator.isURL(v),
       message: 'Link is not valid',
     },
+  },
 
     email: {
       type: String,
@@ -37,7 +38,6 @@ const userSchema = new mongoose.Schema({
       minlength: 8,
       select: false,
     },
-  },
 });
 
 userSchema.statics.findUserByCredentials = function findUserByCredentials(
