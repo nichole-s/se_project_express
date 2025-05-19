@@ -3,7 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { createUser, login } = require('./controllers/users');
 
-mongoose.connect('mongodb://127.0.0.1:27017/wtwr_db');
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/wtwr_db');
 
 const { PORT = 3001 } = process.env;
 const app = express();
