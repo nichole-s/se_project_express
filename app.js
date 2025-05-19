@@ -1,32 +1,23 @@
 const express = require('express');
-// const cors = require('cors');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const { createUser, login } = require('./controllers/users');
 const clothingItem = require('./routes/clothingItems');
 const users = require('./routes/users');
 
-// mongoose.connect('mongodb://localhost:27017/wtwr_db');
 mongoose.connect('mongodb://127.0.0.1:27017/wtwr_db');
 
 const { PORT = 3001 } = process.env;
 const app = express();
 
-// const routes = require('./routes');
-
 app.use(express.json());
-// app.use(cors());
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '63a27f7e04a1f23a6e9413df',
-//   };
-//   next();
-// });
+app.use(cors());
 
-// app.use(routes);
 app.post('/signin', login);
 app.post('/signup', createUser);
-app.use('/items', clothingItem);
-app.use('/users', users);
+
+const routes = require('./routes');
+app.use(routes);
 
 app.use((req, res) => {
   res.status(404).send({ message: 'Requested resource not found' });

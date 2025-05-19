@@ -15,7 +15,7 @@ const createItem = (req, res) => {
     createdAt,
   })
     .then((item) => {
-      res.status(200).send({ data: item });
+      res.status(201).send({ data: item });
     })
     .catch((err) => {
       handleError(err, res);
@@ -48,8 +48,6 @@ const likeItem = (req, res) => {
     });
 };
 
-// Delete
-
 const dislikeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
@@ -65,21 +63,22 @@ const dislikeItem = (req, res) => {
     });
 };
 
+// Delete  
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail(() => {
       handleOnFailError();
     })
     // .then(() => res.status(200).send({}))
     .then((item) => {
-      if (item.owner.equals(req.user._id)) {
-        return item.remove(() => res.send({ clothingItem: item }));
+      if (!item.owner.equals(req.user._id)) {
+        return res.status(403).send({
+          message: 'You do not have permission to delete another users item',
+        });
       }
-      return res.status(403).send({
-        message: 'You do not have permission to delete another users item',
-      });
+      return item.deleteOne().then(() => res.send({ clothingItem: item }));
     })
     .catch((err) => {
       handleError(err, res);

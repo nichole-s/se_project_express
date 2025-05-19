@@ -6,49 +6,35 @@ const { JWT_SECRET } = require('../utils/config');
 const { handleOnFailError, handleError } = require('../utils/errors');
 
 // Create
-// const createUser = (req, res) => {
-//   const {
-//     name, avatar, email, password,
-//   } = req.body;
-//   User.findOne({ email }).then((user) => {
-//     if (user) {
-//       const error = new Error('User with this email already exists');
-//       error.statusCode = 11000;
-//       throw error;
-//     }},
-//    bcrypt.hash(password, 10)
-//     .then(hash => User.create({
-//       name, avatar, email, password: hash,
-//     })
-//     .then((user) => res.send(user)) 
-//     .catch((err) => {
-//       handleError(err, res);
-//     })
-//   },
-
 const createUser = (req, res) => {
-  const {
-    name, avatar, email, password,
-  } = req.body;
-  bcrypt.hash(password, 10).then((hash) => User.create({
-    name,
-    avatar,
-    email,
-    password: hash,
-  })).then((user) => {
-    res.send(user);
-  }).catch((err) => {
-    // handle the error
-    if (err.name === 'MongoServerError') {
+  const { name, avatar, email, password } = req.body;
+
+  User.findOne({ email })
+  .then((existingUser) => {
+    if (existingUser) {
       const error = new Error('User with this email already exists');
       error.statusCode = 11000;
-      handleError(err, res);
+      throw error;
     }
+
+    return bcrypt.hash(password, 10);
   })
-    .then((user) => res.send(user))
-    .catch((err) => {
-      handleError(err, res);
-    });
+  .then((hash) =>
+    User.create({
+      name,
+      avatar,
+      email,
+      password: hash,
+    })
+  )
+  .then((user) => {
+    const userSafe = user.toObject();
+    delete userSafe.password;
+    res.status(201).send(userSafe);
+  })
+  .catch((err) => {
+    handleError(err, res);
+  });
 };
 
 // Read
@@ -61,9 +47,9 @@ const getUsers = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  const { _id } = req.params;
+  const { _id } = req.user;
 
-  User.findById({ _id })
+  User.findById(_id)
     .orFail(() => {
       handleOnFailError();
     })
@@ -73,10 +59,12 @@ const getCurrentUser = (req, res) => {
     });
 };
 
+// Update
 const updateUser = (req, res) => {
-  const { name, avatar, _id } = req.body;
+  const { name, avatar } = req.body;
+  const { _id } = req.user;
   User.findByIdAndUpdate(
-    { _id },
+    _id,
     { name, avatar },
     { new: true, runValidators: true },
   )

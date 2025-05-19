@@ -4,27 +4,27 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
-    type: 'string',
+    type: String,
     default: 'Elise Bouer',
-    required: 'true',
+    required: true,
     minlength: 2,
     maxlength: 30,
   },
 
   avatar: {
-    type: 'string',
+    type: String,
     default:
       'https://practicum-content.s3.us-west-1.amazonaws.com/software-engineer/wtwr-project/Elise.png',
-    required: 'true',
+    required: true,
     validate: {
       validator: (v) => validator.isURL(v),
       message: 'Link is not valid',
     },
 
     email: {
-      type: 'string',
-      required: 'true',
-      unique: 'true',
+      type: String,
+      required: true,
+      unique: true,
       validate: {
         validator: (v) => validator.isEmail(v),
         message: 'Email is not valid',
@@ -32,8 +32,8 @@ const userSchema = new mongoose.Schema({
     },
 
     password: {
-      type: 'string',
-      required: 'true',
+      type: String,
+      required: true,
       minlength: 8,
       select: false,
     },
