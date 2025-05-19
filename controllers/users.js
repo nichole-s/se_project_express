@@ -13,7 +13,7 @@ const createUser = (req, res) => {
   .then((existingUser) => {
     if (existingUser) {
       const error = new Error('User with this email already exists');
-      error.statusCode = 11000;
+      error.statusCode = 409;
       throw error;
     }
 
